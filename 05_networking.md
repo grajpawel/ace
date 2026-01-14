@@ -120,7 +120,7 @@ Routes control traffic flow within a VPC. Firewall rules are stateful and contro
 - **Best Practices:**
 	- Use custom routes for advanced traffic engineering.
 	- Restrict firewall rules to only required ports and sources.
-	- Use service accounts or tags for targetin specific instances.
+	- Use service accounts or tags for targeting specific instances.
 	- Regularly review and remove unused rules (use Firewall Insights).
 - **gcloud Examples:**
 	- Create a firewall rule:

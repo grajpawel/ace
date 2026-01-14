@@ -67,20 +67,48 @@ Managed Kubernetes (K8s) clusters for containerized workloads. Offers both node 
 Platform as a Service (PaaS) for deploying web apps and APIs without managing infrastructure.
 
 - **Environments:**
-  - **Standard:** Sandboxed, supports specific runtimes (Python, Java, Go, Node.js), scales to zero, fast startup.
-  - **Flexible:** Docker-based, custom runtimes, more control, supports background processes.
+	- **Standard:** Sandboxed, supports specific runtimes (Python, Java, Go, Node.js, PHP, Ruby), scales to zero, fast startup, lower cost.
+	- **Flexible:** Docker-based, custom runtimes, more control, supports background processes, SSH access, no scale to zero.
+- **Key Concepts:**
+	- **Services:** Independent microservices within an app (formerly called modules).
+	- **Versions:** Different versions of a service for A/B testing or gradual rollout.
+	- **Instances:** Running copies of a version.
+	- **Traffic Splitting:** Route traffic between versions (IP, cookie, or random).
+- **Features:**
+	- Automatic scaling, load balancing, health checks.
+	- Built-in security (DDoS protection, SSL/TLS).
+	- Application versioning and traffic splitting.
+	- Integration with Cloud services (Cloud SQL, Memorystore, Cloud Storage).
 - **Best Practices:**
-  - Use Standard for rapid scaling and cost efficiency.
-  - Use Flexible for custom dependencies or background processing.
+	- Use Standard for rapid scaling and cost efficiency.
+	- Use Flexible for custom dependencies or background processing.
+	- Use traffic splitting for canary deployments.
+	- One App Engine app per project (cannot be deleted, only disabled).
 - **gcloud Examples:**
-  - Deploy to App Engine (Standard or Flexible):
-    ```sh
-    gcloud app deploy
-    ```
-  - List App Engine services:
-    ```sh
-    gcloud app services list
-    ```
+	- Deploy to App Engine (Standard or Flexible):
+		```sh
+		gcloud app deploy
+		```
+	- Deploy a specific service:
+		```sh
+		gcloud app deploy service.yaml
+		```
+	- List App Engine services:
+		```sh
+		gcloud app services list
+		```
+	- Split traffic between versions:
+		```sh
+		gcloud app services set-traffic my-service --splits=v1=0.9,v2=0.1
+		```
+	- List versions:
+		```sh
+		gcloud app versions list
+		```
+	- Stop a version:
+		```sh
+		gcloud app versions stop v1 --service=my-service
+		```
 
 ---
 
@@ -88,43 +116,119 @@ Platform as a Service (PaaS) for deploying web apps and APIs without managing in
 Fully managed compute for stateless containers. Scales to zero, pay-per-request, HTTP only.
 
 - **Features:**
-  - Deploy containers without managing servers.
-  - Supports any language/runtime via containerization.
-  - Integrated with IAM for secure access.
+	- Deploy containers without managing servers.
+	- Supports any language/runtime via containerization.
+	- Integrated with IAM for secure access.
+	- **Revisions:** Immutable snapshots of configuration/code.
+	- **Traffic splitting:** Route traffic between revisions for canary/blue-green deployments.
+	- **Concurrency:** Handle multiple requests per instance (default 80, max 1000).
+	- Auto-scaling from 0 to 1000+ instances.
+	- Minimum instances to reduce cold starts.
 - **Best Practices:**
-  - Use for microservices, APIs, and event-driven workloads.
-  - Use revisions for safe rollouts and rollbacks.
+	- Use for microservices, APIs, and event-driven workloads.
+	- Use revisions for safe rollouts and rollbacks.
+	- Set appropriate concurrency based on workload (CPU vs I/O bound).
+	- Use minimum instances for latency-sensitive apps.
+	- Store images in Artifact Registry.
 - **gcloud Examples:**
-  - Deploy a container to Cloud Run:
-    ```sh
-    gcloud run deploy my-service --image=gcr.io/PROJECT_ID/my-image --region=us-central1 --platform=managed
-    ```
-  - List Cloud Run services:
-    ```sh
-    gcloud run services list --region=us-central1
-    ```
+	- Deploy a container to Cloud Run:
+		```sh
+		gcloud run deploy my-service \
+			--image=us-central1-docker.pkg.dev/PROJECT_ID/REPO/my-image \
+			--region=us-central1 \
+			--platform=managed \
+			--allow-unauthenticated
+		```
+	- Deploy with minimum instances (reduce cold starts):
+		```sh
+		gcloud run deploy my-service \
+			--image=us-central1-docker.pkg.dev/PROJECT_ID/REPO/my-image \
+			--region=us-central1 \
+			--min-instances=1 \
+			--max-instances=100
+		```
+	- Split traffic between revisions:
+		```sh
+		gcloud run services update-traffic my-service \
+			--to-revisions=my-service-v2=50,my-service-v1=50 \
+			--region=us-central1
+		```
+	- List Cloud Run services:
+		```sh
+		gcloud run services list --region=us-central1
+		```
+	- List revisions:
+		```sh
+		gcloud run revisions list --service=my-service --region=us-central1
+		```
 
 ---
 
 ## Cloud Functions
 Event-driven, serverless functions for lightweight, single-purpose code triggered by events (HTTP, Pub/Sub, Cloud Storage, etc.).
 
+- **Generations:**
+	- **1st gen:** Original Cloud Functions, limited to 540s timeout, fewer triggers.
+	- **2nd gen:** Built on Cloud Run, up to 60min timeout, more CPU/memory, all Eventarc triggers, better concurrency.
+	- **Recommendation:** Use 2nd gen for new functions (better performance, more features).
 - **Features:**
-  - Automatic scaling, pay-per-use.
-  - Supports multiple runtimes (Node.js, Python, Go, Java, etc.).
-  - Integrated with Eventarc for event routing.
+	- Automatic scaling, pay-per-use.
+	- Supports multiple runtimes (Node.js, Python, Go, Java, .NET, Ruby, PHP).
+	- Integrated with Eventarc for event routing.
+	- Minimum instances (reduce cold starts) and maximum instances (control costs).
+- **Common Triggers:**
+	- HTTP/HTTPS requests
+	- Cloud Pub/Sub messages
+	- Cloud Storage events (create, delete, archive, metadata update)
+	- Firestore events
+	- Firebase events
+	- Cloud Scheduler (cron jobs)
 - **Best Practices:**
-  - Use for lightweight, stateless, event-driven tasks.
-  - Keep functions small and single-purpose.
+	- Use for lightweight, stateless, event-driven tasks.
+	- Keep functions small and single-purpose.
+	- Use 2nd gen for longer-running tasks (up to 60 minutes).
+	- Set minimum instances for latency-sensitive workloads.
+	- Use environment variables and Secret Manager for configuration.
 - **gcloud Examples:**
-  - Deploy a function (HTTP trigger):
-    ```sh
-    gcloud functions deploy my-function --runtime=python310 --trigger-http --allow-unauthenticated --region=us-central1
-    ```
-  - List functions:
-    ```sh
-    gcloud functions list --region=us-central1
-    ```
+	- Deploy a function (2nd gen, HTTP trigger):
+		```sh
+		gcloud functions deploy my-function \
+			--gen2 \
+			--runtime=python311 \
+			--trigger-http \
+			--allow-unauthenticated \
+			--region=us-central1
+		```
+	- Deploy a function (Pub/Sub trigger):
+		```sh
+		gcloud functions deploy my-function \
+			--gen2 \
+			--runtime=python311 \
+			--trigger-topic=my-topic \
+			--region=us-central1
+		```
+	- Deploy a function (Cloud Storage trigger):
+		```sh
+		gcloud functions deploy my-function \
+			--gen2 \
+			--runtime=python311 \
+			--trigger-event-filters="type=google.cloud.storage.object.v1.finalized" \
+			--trigger-event-filters="bucket=my-bucket" \
+			--region=us-central1
+		```
+	- List functions:
+		```sh
+		gcloud functions list --region=us-central1
+		```
+	- Set minimum instances (reduce cold starts):
+		```sh
+		gcloud functions deploy my-function \
+			--gen2 \
+			--runtime=python311 \
+			--trigger-http \
+			--min-instances=1 \
+			--region=us-central1
+		```
 
 ---
 

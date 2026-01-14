@@ -286,13 +286,14 @@ See [**00_EXAM_COVERAGE_CHECKLIST.md**](00_EXAM_COVERAGE_CHECKLIST.md) for detai
 
 ## ✅ What Makes These Notes Different
 
-- ✨ **Complete Coverage**: 100% of exam domains with verification checklist
+- ✨ **Complete Coverage**: 100% of exam domains verified and updated (January 2026)
 - 🎯 **Exam-Focused**: Common scenarios, decision trees, and exam tips throughout
 - 💻 **Hands-on**: 200+ gcloud command examples you can run
 - 📊 **Visual Learning**: Comparison tables, diagrams, and structured layouts
 - 🔍 **Deep Dives**: Not just "what" but "when" and "why" to use each service
 - 🎓 **Best Practices**: Google-recommended patterns and anti-patterns
 - 🚨 **Common Pitfalls**: Exam traps and gotchas highlighted
+- 🔄 **Up-to-date**: Includes 2nd gen Cloud Functions, latest GKE features, Artifact Registry
 
 ## 🤝 Contributing
 

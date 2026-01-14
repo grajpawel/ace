@@ -5,31 +5,63 @@ Google Cloud offers a range of load balancing and traffic management solutions t
 ## Load Balancers
 Distribute incoming traffic across multiple resources to maximize uptime and performance. Choose the right load balancer based on protocol, scope, and features.
 
-- **HTTP(S) Load Balancer:**
-  - Global, Layer 7 (application), supports SSL offload, content-based routing, autoscaling, Cloud CDN integration.
-  - Use for web apps, APIs, and global services.
-- **SSL Proxy Load Balancer:**
-  - Global, Layer 4, for encrypted non-HTTP traffic (e.g., SMTPS, FTPS).
-- **TCP Proxy Load Balancer:**
-  - Global, Layer 4, for non-HTTP TCP traffic.
-- **Network Load Balancer:**
-  - Regional, Layer 4, for TCP/UDP, ultra-low latency, preserves client IP.
+- **HTTP(S) Load Balancer (Global):**
+	- Global, Layer 7 (application), supports SSL offload, content-based routing, autoscaling, Cloud CDN integration.
+	- Use for web apps, APIs, and global services.
+	- **Backend services:** Compute Engine instance groups, GKE, Cloud Run, Cloud Functions (2nd gen), App Engine.
+	- **Backend buckets:** Cloud Storage buckets for static content.
+	- URL maps for path-based routing.
+- **SSL Proxy Load Balancer (Global):**
+	- Global, Layer 4, for encrypted non-HTTP traffic (e.g., SMTPS, FTPS).
+	- Terminates SSL/TLS at load balancer.
+- **TCP Proxy Load Balancer (Global):**
+	- Global, Layer 4, for non-HTTP TCP traffic.
+	- Preserves client IP with PROXY protocol.
+- **Network Load Balancer (Regional):**
+	- Regional, Layer 4, for TCP/UDP, ultra-low latency, preserves client IP.
+	- Passthrough (no proxying), supports unhealthy instances.
+	- Use for applications requiring source IP preservation.
+- **Internal Load Balancers:**
+	- **Internal HTTP(S) LB:** Regional, Layer 7, for internal services.
+	- **Internal TCP/UDP LB:** Regional, Layer 4, for internal traffic.
 - **Best Practices:**
-  - Use global HTTP(S) LB for multi-region, scalable web apps.
-  - Use network LB for latency-sensitive, regional workloads.
-  - Integrate with Cloud Armor for security.
+	- Use global HTTP(S) LB for multi-region, scalable web apps.
+	- Use network LB for latency-sensitive, regional workloads.
+	- Integrate with Cloud Armor for security.
+	- Use health checks to ensure only healthy backends receive traffic.
+	- Use SSL policies to enforce TLS versions.
 - **gcloud Examples:**
-  - Create a global HTTP(S) load balancer (basic example):
-    ```sh
-    gcloud compute forwarding-rules create my-http-rule \
-      --global \
-      --target-http-proxy=my-proxy \
-      --ports=80
-    ```
-  - List load balancers:
-    ```sh
-    gcloud compute forwarding-rules list
-    ```
+	- Create a backend service:
+		```sh
+		gcloud compute backend-services create my-backend-service \
+			--global \
+			--protocol=HTTP \
+			--health-checks=my-health-check \
+			--port-name=http
+		```
+	- Add instance group to backend service:
+		```sh
+		gcloud compute backend-services add-backend my-backend-service \
+			--instance-group=my-instance-group \
+			--instance-group-zone=us-central1-a \
+			--global
+		```
+	- Create a URL map:
+		```sh
+		gcloud compute url-maps create my-url-map \
+			--default-service=my-backend-service
+		```
+	- Create an HTTP(S) load balancer (forwarding rule):
+		```sh
+		gcloud compute forwarding-rules create my-http-rule \
+			--global \
+			--target-http-proxy=my-proxy \
+			--ports=80
+		```
+	- List load balancers:
+		```sh
+		gcloud compute forwarding-rules list
+		```
 
 ---
 
