@@ -43,10 +43,18 @@ Managed Kubernetes (K8s) clusters for containerized workloads. Offers both node 
   - **Regional:** Multi-zone, high availability.
   - **Zonal:** Single zone, lower cost.
   - **Private Clusters:** Nodes have no public IPs, enhanced security.
+- **Kubernetes Service Types:**
+  - **ClusterIP (default):** Internal IP only, accessible within the cluster.
+  - **NodePort:** Exposes service on each node's IP at a static port (30000-32767 range).
+  - **LoadBalancer:** Provisions a cloud load balancer (GCP Network/HTTP(S) LB), external access.
+  - **ExternalName:** Maps service to a DNS name (CNAME record).
 - **Best Practices:**
   - Use regional clusters for production workloads.
   - Enable node auto-upgrade and auto-repair.
   - Use Workload Identity for secure service-to-service auth.
+  - Use LoadBalancer type for external services (not NodePort in production).
+  - Use ClusterIP for internal microservices communication.
+  - Use Ingress (with GKE Ingress controller) for HTTP(S) routing instead of multiple LoadBalancers.
 - **gcloud Examples:**
   - Create a standard cluster:
     ```sh
@@ -59,6 +67,31 @@ Managed Kubernetes (K8s) clusters for containerized workloads. Offers both node 
   - List clusters:
     ```sh
     gcloud container clusters list
+    ```
+  - Get cluster credentials (configure kubectl):
+    ```sh
+    gcloud container clusters get-credentials my-cluster --zone=us-central1-a
+    ```
+- **kubectl Examples:**
+  - Create a deployment:
+    ```sh
+    kubectl create deployment my-app --image=gcr.io/PROJECT_ID/my-image
+    ```
+  - Expose deployment as ClusterIP service (internal):
+    ```sh
+    kubectl expose deployment my-app --port=80 --target-port=8080 --type=ClusterIP
+    ```
+  - Expose deployment as NodePort service:
+    ```sh
+    kubectl expose deployment my-app --port=80 --target-port=8080 --type=NodePort
+    ```
+  - Expose deployment as LoadBalancer service (external):
+    ```sh
+    kubectl expose deployment my-app --port=80 --target-port=8080 --type=LoadBalancer
+    ```
+  - List services:
+    ```sh
+    kubectl get services
     ```
 
 ---

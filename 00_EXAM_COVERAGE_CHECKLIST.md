@@ -187,6 +187,7 @@ This checklist maps your notes to the official Google Associate Cloud Engineer e
 - [x] Service account keys - [File 07](07_identity_and_security.md)
 - [x] Workload Identity - [File 07](07_identity_and_security.md)
 - [x] IAM Conditions - [File 07](07_identity_and_security.md)
+- [x] OS Login - [File 07](07_identity_and_security.md)
 - [x] Cloud Identity - [File 07](07_identity_and_security.md)
 
 #### 5.2 Managing service accounts

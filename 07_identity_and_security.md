@@ -196,6 +196,56 @@ Add conditional logic to IAM policies for fine-grained, attribute-based access c
 
 ---
 
+## OS Login
+Manages SSH access to Compute Engine VMs using IAM instead of managing SSH keys manually. Simplifies access control and improves security.
+
+- **Features:**
+	- Links Linux user accounts to Google identities (IAM).
+	- Automatically manages SSH keys (no manual key distribution).
+	- Integrates with IAM roles for access control.
+	- Supports two-factor authentication (2FA).
+	- Provides audit logs for SSH access.
+- **Key IAM Roles:**
+	- `roles/compute.osLogin` - Standard user access (non-admin).
+	- `roles/compute.osAdminLogin` - Admin (sudo) access.
+- **Metadata Keys:**
+	- `enable-oslogin=TRUE` - Enable OS Login at project or instance level.
+	- `enable-oslogin-2fa=TRUE` - Require 2FA for SSH access.
+- **Best Practices:**
+	- Enable OS Login organization-wide for centralized access management.
+	- Use `roles/compute.osAdminLogin` sparingly (grant only when sudo needed).
+	- Enable 2FA for privileged accounts.
+	- Use OS Login instead of managing SSH keys manually (metadata-based keys).
+- **gcloud Examples:**
+	- Enable OS Login at project level:
+		```sh
+		gcloud compute project-info add-metadata \
+			--metadata enable-oslogin=TRUE
+		```
+	- Enable OS Login with 2FA:
+		```sh
+		gcloud compute project-info add-metadata \
+			--metadata enable-oslogin=TRUE,enable-oslogin-2fa=TRUE
+		```
+	- Grant OS Login access to a user:
+		```sh
+		gcloud projects add-iam-policy-binding PROJECT_ID \
+			--member=user:alice@example.com \
+			--role=roles/compute.osLogin
+		```
+	- Grant OS Admin Login (sudo) access:
+		```sh
+		gcloud projects add-iam-policy-binding PROJECT_ID \
+			--member=user:alice@example.com \
+			--role=roles/compute.osAdminLogin
+		```
+	- SSH to a VM with OS Login:
+		```sh
+		gcloud compute ssh VM_NAME --zone=ZONE
+		```
+
+---
+
 ## Cloud Identity
 Identity as a Service (IDaaS) for managing users and groups. Foundation for Google Workspace and GCP IAM.
 
