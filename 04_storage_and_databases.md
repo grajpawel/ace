@@ -14,10 +14,15 @@ Object storage for unstructured data such as files, images, backups, and media. 
 	- Lifecycle rules for automatic data management (e.g., auto-delete, class transition).
 	- Retention policies for compliance and legal hold.
 	- Object versioning and uniform bucket-level access.
+	- **CORS (Cross-Origin Resource Sharing):** Configure buckets to allow web apps from different origins to access resources.
+	- **Signed URLs:** Time-limited URLs for secure, temporary access to objects without authentication.
+	- **Customer-managed encryption keys (CMEK):** Use Cloud KMS keys for encryption.
 - **Best Practices:**
 	- Use lifecycle rules to manage storage costs.
 	- Enable object versioning for critical data.
 	- Use signed URLs for secure, temporary access.
+	- Configure CORS for web applications accessing Cloud Storage.
+	- Use CMEK for sensitive data requiring customer-controlled encryption.
 - **gcloud Examples:**
 	- Create a bucket:
 		```sh
@@ -195,6 +200,36 @@ Fully managed, PostgreSQL-compatible database designed for enterprise workloads 
 	- List AlloyDB clusters:
 		```sh
 		gcloud alloydb clusters list --region=us-central1
+		```
+
+---
+
+## Database Migration Service (DMS)
+Serverless service for migrating databases to Cloud SQL with minimal downtime.
+
+- **Supported Sources:**
+	- MySQL, PostgreSQL, SQL Server, Oracle.
+	- On-premises, AWS RDS, Azure Database, other cloud providers.
+- **Features:**
+	- Continuous data replication for minimal downtime.
+	- Schema and data migration.
+	- Automated validation and monitoring.
+- **Best Practices:**
+	- Test migrations in non-production first.
+	- Monitor replication lag during migration.
+	- Use Cloud VPN or Interconnect for secure connectivity.
+- **gcloud Examples:**
+	- Create a migration job:
+		```sh
+		gcloud database-migration migration-jobs create my-migration \
+			--region=us-central1 \
+			--type=CONTINUOUS \
+			--source=SOURCE_CONNECTION_PROFILE \
+			--destination=DESTINATION_CONNECTION_PROFILE
+		```
+	- List migration jobs:
+		```sh
+		gcloud database-migration migration-jobs list --region=us-central1
 		```
 
 ---

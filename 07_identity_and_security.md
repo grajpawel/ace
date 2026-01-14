@@ -58,6 +58,76 @@ Special Google accounts for applications, VMs, or services to access resources s
 
 ---
 
+## Workload Identity (GKE)
+Recommended way for GKE workloads to access Google Cloud services. Allows Kubernetes service accounts to act as Google service accounts.
+
+- **Features:**
+	- No service account keys needed (more secure).
+	- Kubernetes pods authenticate as Google service accounts.
+	- Automatic credential rotation.
+	- Fine-grained IAM permissions per workload.
+- **Best Practices:**
+	- Always use Workload Identity for GKE clusters (instead of node service accounts).
+	- Create dedicated Google service accounts per application.
+	- Grant minimal permissions to each service account.
+- **gcloud Examples:**
+	- Enable Workload Identity on a new cluster:
+		```sh
+		gcloud container clusters create my-cluster \
+			--workload-pool=PROJECT_ID.svc.id.goog \
+			--region=us-central1
+		```
+	- Enable Workload Identity on existing cluster:
+		```sh
+		gcloud container clusters update my-cluster \
+			--workload-pool=PROJECT_ID.svc.id.goog \
+			--region=us-central1
+		```
+	- Bind Kubernetes SA to Google SA:
+		```sh
+		gcloud iam service-accounts add-iam-policy-binding GSA_NAME@PROJECT_ID.iam.gserviceaccount.com \
+			--role=roles/iam.workloadIdentityUser \
+			--member="serviceAccount:PROJECT_ID.svc.id.goog[NAMESPACE/KSA_NAME]"
+		```
+
+---
+
+## Custom IAM Roles
+Create tailored roles with specific permissions when predefined roles don't fit requirements.
+
+- **Features:**
+	- Define exact permissions needed.
+	- Can be created at organization or project level.
+	- Support for IAM conditions (time-based, resource-based access).
+	- Must specify support level (ALPHA, BETA, GA).
+- **Best Practices:**
+	- Use predefined roles when possible (easier to maintain).
+	- Create custom roles for specific organizational needs.
+	- Regularly review and update custom role permissions.
+	- Test custom roles in dev before deploying to prod.
+- **gcloud Examples:**
+	- Create a custom role:
+		```sh
+		gcloud iam roles create myCustomRole \
+			--project=PROJECT_ID \
+			--title="My Custom Role" \
+			--description="Custom role for specific permissions" \
+			--permissions=compute.instances.list,compute.instances.get \
+			--stage=GA
+		```
+	- Update a custom role:
+		```sh
+		gcloud iam roles update myCustomRole \
+			--project=PROJECT_ID \
+			--add-permissions=compute.instances.start
+		```
+	- List custom roles:
+		```sh
+		gcloud iam roles list --project=PROJECT_ID --show-deleted
+		```
+
+---
+
 ## Audit Logs
 Track admin activity, data access, system events, and policy denials for compliance, troubleshooting, and security monitoring.
 
@@ -67,17 +137,86 @@ Track admin activity, data access, system events, and policy denials for complia
   - **System Event:** GCP system actions.
   - **Policy Denied:** Denied access attempts due to policy.
 - **Best Practices:**
-  - Enable Data Access logs for sensitive resources.
-  - Export logs to BigQuery or Cloud Storage for analysis and retention.
+	- Enable Data Access logs for sensitive resources.
+	- Export logs to BigQuery or Cloud Storage for analysis and retention.
 - **gcloud Examples:**
-  - List audit log sinks:
-    ```sh
-    gcloud logging sinks list
-    ```
-  - Create a log sink to export to BigQuery:
-    ```sh
-    gcloud logging sinks create my-sink bigquery.googleapis.com/projects/PROJECT_ID/datasets/MY_DATASET --log-filter='logName:"cloudaudit.googleapis.com"'
-    ```
+	- List audit log sinks:
+		```sh
+		gcloud logging sinks list
+		```
+	- Create a log sink to export to BigQuery:
+		```sh
+		gcloud logging sinks create my-sink bigquery.googleapis.com/projects/PROJECT_ID/datasets/MY_DATASET --log-filter='logName:"cloudaudit.googleapis.com"'
+		```
+
+### Access Transparency
+Provides logs of Google Cloud support and engineering access to customer data.
+
+- **Features:**
+	- Records when Google personnel access your content.
+	- Available for Google Cloud Premium Support customers.
+	- Logs include justification, timestamp, and accessed resources.
+	- Helps meet compliance requirements.
+- **Best Practices:**
+	- Review Access Transparency logs regularly.
+	- Integrate with security monitoring systems.
+- **Note:** Enterprise-only feature, requires Premium Support.
+
+---
+
+## IAM Conditions
+Add conditional logic to IAM policies for fine-grained, attribute-based access control.
+
+- **Features:**
+	- Time-based access (grant access during business hours only).
+	- Resource-based access (access specific resources only).
+	- IP-based access (restrict to specific IP ranges).
+	- Multiple conditions combined with AND/OR logic.
+- **Common Use Cases:**
+	- Temporary access for contractors (time-based).
+	- Access to dev resources only during work hours.
+	- Restrict access by geography/IP.
+	- Access to specific resource patterns (e.g., buckets with specific prefix).
+- **Best Practices:**
+	- Use for temporary or conditional access requirements.
+	- Test conditions thoroughly before production use.
+	- Document condition logic for maintainability.
+- **Example Condition Expressions:**
+	- Time-based: `request.time < timestamp('2026-12-31T00:00:00Z')`
+	- Resource-based: `resource.name.startsWith('projects/_/buckets/dev-')`
+	- IP-based: `origin.ip in ['203.0.113.0/24']`
+- **gcloud Examples:**
+	- Add IAM binding with condition:
+		```sh
+		gcloud projects add-iam-policy-binding PROJECT_ID \
+			--member="user:user@example.com" \
+			--role="roles/storage.objectViewer" \
+			--condition='expression=request.time < timestamp("2026-12-31T00:00:00Z"),title=Temporary Access,description=Access until end of 2026'
+		```
+
+---
+
+## Cloud Identity
+Identity as a Service (IDaaS) for managing users and groups. Foundation for Google Workspace and GCP IAM.
+
+- **Features:**
+	- User and group management.
+	- Single Sign-On (SSO) integration.
+	- Multi-factor authentication (MFA).
+	- Device management.
+	- Works with Google Workspace or standalone.
+- **Free vs Premium:**
+	- **Free:** Basic user/group management, essential security.
+	- **Premium:** Advanced security, endpoint management, context-aware access.
+- **Best Practices:**
+	- Use Cloud Identity for centralized user management.
+	- Integrate with existing identity providers (SAML, OIDC).
+	- Enforce MFA for all users.
+	- Use groups for IAM policy management (not individual users).
+- **Integration with GCP:**
+	- Cloud Identity users/groups can be granted IAM roles.
+	- Supports organization-level policies.
+	- Works with VPC Service Controls and Access Context Manager.
 
 ---
 

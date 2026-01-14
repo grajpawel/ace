@@ -107,6 +107,79 @@ Used by instance groups and load balancers to determine resource health. Ensures
 
 ---
 
+## Error Reporting
+Automatically groups and displays errors from Cloud services and applications. Helps identify and track application errors.
+
+- **Features:**
+	- Automatic error grouping and deduplication.
+	- Stack trace analysis.
+	- Integration with Cloud Logging.
+	- Email and mobile notifications.
+	- Support for App Engine, Cloud Functions, Cloud Run, GKE, Compute Engine.
+- **Best Practices:**
+	- Use client libraries to report custom errors.
+	- Set up notifications for new or recurring errors.
+	- Link to issue tracking systems.
+- **gcloud Examples:**
+	- List error groups:
+		```sh
+		gcloud error-reporting events list
+		```
+	- Note: Most Error Reporting operations are performed via Console or API.
+
+---
+
+## Service Level Objectives (SLOs) & Monitoring
+Define and monitor service reliability using SLIs (Service Level Indicators) and SLOs (Service Level Objectives).
+
+- **Concepts:**
+	- **SLI:** Quantitative measure of service level (e.g., latency, availability, error rate).
+	- **SLO:** Target value or range for an SLI (e.g., 99.9% availability).
+	- **SLA:** Contractual agreement with consequences for not meeting SLOs.
+	- **Error Budget:** Amount of acceptable unreliability (100% - SLO).
+- **Features:**
+	- Define SLOs in Cloud Monitoring.
+	- Track SLO compliance and error budget burn rate.
+	- Alerting on SLO violations.
+- **Best Practices:**
+	- Define SLOs based on user experience.
+	- Start with achievable SLOs and iterate.
+	- Use error budgets for change management decisions.
+	- Monitor SLO burn rate for early warnings.
+- **gcloud Examples:**
+	- Create an SLO (example using Console or API):
+		- SLOs are typically configured via Cloud Console or Monitoring API.
+
+---
+
+## Uptime Checks
+Monitor availability and response time of public endpoints (URLs, VMs, load balancers).
+
+- **Features:**
+	- HTTP(S), TCP, and custom protocol checks.
+	- Checks from multiple global locations.
+	- Alerting on failures or latency threshold violations.
+	- Integration with Cloud Monitoring dashboards.
+- **Best Practices:**
+	- Set up uptime checks for all public-facing services.
+	- Use checks from multiple regions for global monitoring.
+	- Configure alerts for rapid incident response.
+- **gcloud Examples:**
+	- Create an uptime check:
+		```sh
+		gcloud monitoring uptime-checks create my-uptime-check \
+			--display-name="My Website Check" \
+			--resource-type=uptime-url \
+			--host=example.com \
+			--path=/
+		```
+	- List uptime checks:
+		```sh
+		gcloud monitoring uptime-checks list
+		```
+
+---
+
 ## Key Differences
 - **Monitoring:** Metrics, dashboards, alerts for resource and app health.
 - **Logging:** Log collection, routing, analysis, and alerting.

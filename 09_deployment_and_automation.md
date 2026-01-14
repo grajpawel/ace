@@ -76,6 +76,94 @@ Fully managed CI/CD service for building, testing, and deploying code. Supports 
 
 ---
 
+## Cloud Source Repositories
+Fully managed, private Git repositories hosted on GCP. Integrated with Cloud Build, Cloud Debugger, and other GCP services.
+
+- **Features:**
+	- Unlimited private Git repositories.
+	- Integration with GitHub and Bitbucket (mirror repos).
+	- Cloud Build triggers for CI/CD.
+	- IAM-based access control.
+	- Integration with Cloud Shell and local IDEs.
+- **Best Practices:**
+	- Use for GCP-native projects and infrastructure code.
+	- Set up Cloud Build triggers for automated deployments.
+	- Use IAM to control repository access.
+- **gcloud Examples:**
+	- Create a repository:
+		```sh
+		gcloud source repos create my-repo
+		```
+	- Clone a repository:
+		```sh
+		gcloud source repos clone my-repo
+		```
+	- List repositories:
+		```sh
+		gcloud source repos list
+		```
+
+---
+
+## Terraform with Google Cloud
+Infrastructure as Code (IaC) tool for provisioning and managing GCP resources. Alternative to Deployment Manager.
+
+- **Features:**
+	- Declarative configuration using HashiCorp Configuration Language (HCL).
+	- Multi-cloud support (GCP, AWS, Azure, etc.).
+	- State management for tracking infrastructure.
+	- Modules for reusable infrastructure patterns.
+	- Plan and apply workflow for safe changes.
+- **Best Practices:**
+	- Store Terraform state in Cloud Storage with state locking.
+	- Use Terraform modules for common patterns.
+	- Use workspaces for multiple environments (dev, staging, prod).
+	- Store Terraform code in version control.
+- **Basic Terraform Example:**
+	```hcl
+	# provider.tf
+	provider "google" {
+	  project = "my-project"
+	  region  = "us-central1"
+	}
+
+	# main.tf
+	resource "google_compute_instance" "vm" {
+	  name         = "my-vm"
+	  machine_type = "e2-medium"
+	  zone         = "us-central1-a"
+
+	  boot_disk {
+	    initialize_params {
+	      image = "debian-cloud/debian-11"
+	    }
+	  }
+
+	  network_interface {
+	    network = "default"
+	  }
+	}
+	```
+- **Common Commands:**
+	- Initialize Terraform:
+		```sh
+		terraform init
+		```
+	- Plan changes:
+		```sh
+		terraform plan
+		```
+	- Apply changes:
+		```sh
+		terraform apply
+		```
+	- Destroy infrastructure:
+		```sh
+		terraform destroy
+		```
+
+---
+
 ## Key Differences
 - **Deployment Manager:** IaC, declarative, GCP-native, YAML/Python configs.
 - **Marketplace:** Prebuilt solutions, fast deployment, catalog-driven.

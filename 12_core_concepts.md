@@ -58,6 +58,121 @@ Key-value pairs attached to resources for organization, filtering, automation, a
 
 ---
 
+## Service Level Agreements (SLA), Objectives (SLO), and Indicators (SLI)
+Understanding service reliability metrics is important for architecture decisions.
+
+### SLA (Service Level Agreement)
+- **Definition:** Contractual commitment between Google and customers.
+- **Typical GCP SLAs:**
+	- Compute Engine: 99.99% (multi-zone), 99.5% (single instance)
+	- Cloud Storage: 99.95% (multi-region), 99.9% (regional)
+	- Cloud SQL: 99.95% (HA), 99.5% (single instance)
+	- GKE: 99.95% (regional), 99.5% (zonal)
+	- Cloud Run: 99.95%
+	- BigQuery: 99.99%
+- **Service Credits:** Google provides credits if SLA is not met.
+- **Exclusions:** SLA typically excludes events beyond Google's control, scheduled maintenance, customer misconfigurations.
+
+### SLO (Service Level Objective)
+- **Definition:** Internal target for service performance (stricter than SLA).
+- **Purpose:** Guide operational decisions and capacity planning.
+- **Example:** Target 99.99% availability even if SLA is 99.9%.
+
+### SLI (Service Level Indicator)
+- **Definition:** Quantitative measure of service level.
+- **Common SLIs:**
+	- Availability (uptime percentage)
+	- Latency (response time)
+	- Error rate
+	- Throughput
+
+**Exam Tip:** 
+- SLA = Contract with customers
+- SLO = Internal target
+- SLI = Actual measurement
+
+---
+
+## Resource Location Types
+Understanding location types helps optimize latency, availability, and compliance.
+
+### Multi-region
+- **Definition:** Resources replicated across multiple regions within a large geographic area.
+- **Examples:** 
+	- Cloud Storage: US, EU, ASIA multi-regions
+	- BigQuery: US, EU multi-regions
+- **Benefits:** Highest availability and disaster recovery.
+- **Cost:** Typically higher than regional.
+- **Use cases:** Global applications, critical data requiring redundancy.
+
+### Dual-region
+- **Definition:** Resources replicated across two specific regions.
+- **Examples:**
+	- Cloud Storage: us-central1 + us-east1
+	- Spanner: Regional + witness region
+- **Benefits:** Balance of cost and availability.
+- **Use cases:** High availability within specific geography.
+
+### Regional
+- **Definition:** Resources in a specific region (multiple zones).
+- **Examples:** Most GCP services (Compute Engine, GKE, Cloud SQL)
+- **Benefits:** Lower latency, data residency compliance.
+- **Cost:** Lower than multi-region.
+- **Use cases:** Most production workloads.
+
+### Zonal
+- **Definition:** Resources in a specific zone within a region.
+- **Examples:** Compute Engine instances, zonal persistent disks
+- **Benefits:** Lowest cost, specific placement.
+- **Risk:** Single point of failure (zone outage affects resource).
+- **Use cases:** Development, testing, non-critical workloads.
+
+### Global
+- **Definition:** Resources managed globally but may have regional endpoints.
+- **Examples:** 
+	- HTTP(S) Load Balancer
+	- Cloud CDN
+	- Cloud IAM
+	- VPC networks
+- **Benefits:** Unified management, global reach.
+
+**Exam Tip:** 
+- Multi-region = Highest availability, highest cost
+- Regional = Standard for production
+- Zonal = Lower cost, lower availability
+- Choose based on availability requirements and budget
+
+---
+
+## Cloud Console Basics
+Web-based GUI for managing GCP resources. Essential for exam scenarios involving UI operations.
+
+### Key Features:
+- **Dashboard:** Overview of projects, resources, billing
+- **Navigation Menu:** Access to all GCP services
+- **Cloud Shell:** Browser-based terminal with gcloud pre-installed
+- **Activity Logs:** Recent actions and changes
+- **Notifications:** Alerts, recommendations, billing warnings
+- **Search:** Find resources, documentation, products
+- **IAM & Admin:** Manage permissions, service accounts, quotas
+- **APIs & Services:** Enable/disable APIs, view usage
+
+### Common Tasks:
+1. **Switch Projects:** Use project selector dropdown
+2. **Enable APIs:** Navigation > APIs & Services > Library
+3. **View Billing:** Navigation > Billing
+4. **Create Resources:** Navigate to service > Create
+5. **Cloud Shell:** Click terminal icon (top right)
+6. **Search Resources:** Use search bar (top)
+
+**Best Practices:**
+- Use Cloud Console for exploration and one-time tasks
+- Use gcloud/Terraform for automation and IaC
+- Enable MFA for console access
+- Review Activity logs regularly
+
+---
+
 ## Pricing Calculator & Cost Estimation
 - **Pricing Calculator:** Web tool to estimate costs for GCP resources and architectures ([GCP Pricing Calculator](https://cloud.google.com/products/calculator)).
 - **Cost Estimation:** Use budgets, alerts, and billing export for ongoing cost management.
