@@ -364,15 +364,82 @@ Suite of network monitoring and troubleshooting tools.
 ---
 
 ## Cloud DNS
-Managed DNS service for public and private DNS zones.
+Managed DNS service for public and private DNS zones. Provides authoritative DNS resolution with low latency and high availability.
 
+- **Zone Types:**
+	- **Public Zones:** Serve DNS records to the internet.
+	- **Private Zones:** Serve DNS records to VPC networks only (internal resolution).
+- **DNS Record Types (Important for Exam):**
+	- **A Record:** Maps hostname to IPv4 address (e.g., `example.com` → `203.0.113.1`)
+	- **AAAA Record:** Maps hostname to IPv6 address
+	- **CNAME Record:** Canonical name, maps alias to another domain name (e.g., `www.example.com` → `example.com`)
+		- Cannot be used at zone apex (root domain)
+		- Points to another domain, not an IP
+	- **NS Record:** Name Server, delegates subdomain to another DNS server
+		- Specifies authoritative name servers for a zone
+		- Example: `subdomain.example.com` delegated to `ns1.google.com`
+	- **MX Record:** Mail Exchange, directs email to mail servers (has priority value)
+	- **TXT Record:** Text record for verification, SPF, DKIM, etc.
+	- **PTR Record:** Pointer for reverse DNS lookup (IP to hostname)
+	- **SOA Record:** Start of Authority, contains zone metadata (created automatically)
+- **Features:**
+	- DNSSEC for security (protects against DNS spoofing)
+	- 100% uptime SLA
+	- Anycast name servers for low latency
+	- Private DNS zones for split-horizon DNS
+	- Cloud DNS peering and DNS forwarding
+- **Common Exam Scenarios:**
+	- **Use A record** when mapping domain to static IP
+	- **Use CNAME** when creating alias (www, blog, shop)
+	- **Use NS record** when delegating subdomain to different name servers
+	- **Cannot use CNAME at zone apex** (must use A or AAAA)
 - **Best Practices:**
 	- Use private zones for internal DNS resolution.
-	- Use DNSSEC for security.
+	- Use DNSSEC for public zones.
+	- Use Cloud DNS peering for cross-VPC DNS resolution.
+	- Set appropriate TTL values (lower for frequently changing records).
 - **gcloud Examples:**
-	- Create a DNS managed zone:
+	- Create a public DNS managed zone:
 		```sh
-		gcloud dns managed-zones create my-zone --dns-name="example.com." --description="My zone"
+		gcloud dns managed-zones create my-zone \
+			--dns-name="example.com." \
+			--description="My public zone"
+		```
+	- Create a private DNS zone:
+		```sh
+		gcloud dns managed-zones create my-private-zone \
+			--dns-name="internal.example.com." \
+			--description="My private zone" \
+			--visibility=private \
+			--networks=my-vpc
+		```
+	- Add an A record:
+		```sh
+		gcloud dns record-sets create www.example.com. \
+			--zone=my-zone \
+			--type=A \
+			--ttl=300 \
+			--rrdatas=203.0.113.1
+		```
+	- Add a CNAME record:
+		```sh
+		gcloud dns record-sets create blog.example.com. \
+			--zone=my-zone \
+			--type=CNAME \
+			--ttl=300 \
+			--rrdatas=www.example.com.
+		```
+	- Add an MX record:
+		```sh
+		gcloud dns record-sets create example.com. \
+			--zone=my-zone \
+			--type=MX \
+			--ttl=300 \
+			--rrdatas="10 mail.example.com."
+		```
+	- List DNS records:
+		```sh
+		gcloud dns record-sets list --zone=my-zone
 		```
 	- List managed zones:
 		```sh
