@@ -144,6 +144,91 @@ Understanding location types helps optimize latency, availability, and complianc
 
 ---
 
+## Zone-Specific Resource Limitations (Important for Exam!)
+
+Not all resources are available in every zone or region. Understanding these limitations is critical for exam questions about deployment failures or resource availability.
+
+### GPU/Accelerator Availability
+**GPUs are zone-specific** - not all machine types with GPUs are available in every zone.
+
+- **GPU Types:**
+	- **NVIDIA T4:** General-purpose AI/ML inference (most widely available)
+	- **NVIDIA V100:** High-performance training (limited zones)
+	- **NVIDIA A100:** Latest generation, highest performance (very limited availability)
+	- **NVIDIA P4, P100, K80:** Older generations (limited zones)
+- **Key Exam Points:**
+	- GPUs are **NOT available in all zones** (common exam trap)
+	- Must check GPU availability before deploying
+	- Different GPU types available in different zones
+	- A2 machine family (A100 GPUs) only in select zones
+- **How to Check Availability:**
+	```sh
+	gcloud compute accelerator-types list --filter="zone:us-central1-a"
+	```
+- **Common Exam Scenario:**
+	- **Question:** "VM creation fails with GPU attached. What's wrong?"
+	- **Answer:** GPUs not available in that specific zone. Choose different zone or GPU type.
+
+### Machine Type Availability
+Some machine types are zone-specific:
+
+- **A2 Family** (A100 GPUs): Very limited zones (e.g., us-central1-a, europe-west4-a)
+- **C2/C2D Family** (Compute-optimized): Not in all zones
+- **N2D Family** (AMD): Limited to specific zones
+- **M1/M2/M3 Family** (Memory-optimized): Limited availability
+- **Best Practice:** Always verify machine type availability in target zone
+- **Command to check:**
+	```sh
+	gcloud compute machine-types list --zones=us-central1-a
+	```
+
+### Other Zone/Region-Specific Limitations
+
+1. **Local SSDs:**
+	- Available in most zones but not all
+	- Number of SSDs allowed varies by machine type and zone
+
+2. **Committed Use Discounts (CUDs):**
+	- Must be purchased for specific region
+	- GPUs CUDs only available in zones where GPU types exist
+
+3. **Sole-Tenant Nodes:**
+	- Not available in all zones
+	- Check availability before deployment
+
+4. **Shielded VMs:**
+	- Some older zones don't support all shielded VM features
+
+5. **Regional Persistent Disks:**
+	- Must select 2 zones within same region
+	- Not all zone pairs supported (check before creation)
+
+6. **GKE Node Pools:**
+	- Custom machine types with GPUs limited by zone availability
+	- Autopilot clusters may have different resource availability
+
+### Exam Strategy for Availability Questions
+
+**When you see a deployment error in exam:**
+1. ✅ Check if resource is available in that zone/region
+2. ✅ Verify quotas haven't been exceeded
+3. ✅ Confirm APIs are enabled
+4. ✅ Check if resource type supports the configuration
+
+**Common exam error scenarios:**
+- "GPU not available" → Wrong zone selected
+- "Machine type not found" → Zone doesn't support that machine type
+- "Quota exceeded" → Need to request quota increase
+- "API not enabled" → Enable required API
+
+**How to avoid issues:**
+- Use `gcloud compute zones list` to see all zones
+- Use `gcloud compute machine-types list --filter="zone:ZONE"` to check availability
+- Use `gcloud compute accelerator-types list` to check GPU availability
+- Choose widely-available options for production (e.g., N2, E2 machine types)
+
+---
+
 ## Cloud Console Basics
 Web-based GUI for managing GCP resources. Essential for exam scenarios involving UI operations.
 
