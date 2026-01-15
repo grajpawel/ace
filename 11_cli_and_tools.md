@@ -53,6 +53,61 @@ CLI for interacting with Kubernetes clusters (GKE or other). Used to deploy, man
 
 ---
 
+## When to Use gcloud vs kubectl (Important for Exam!)
+
+Understanding when to use `gcloud` vs `kubectl` is critical for GKE-related exam questions.
+
+### Use `gcloud` for:
+- **GKE cluster management** (infrastructure layer):
+	- Creating, updating, deleting GKE clusters
+	- Managing node pools (add, delete, resize)
+	- Configuring cluster settings (autoscaling, network policy, Workload Identity)
+	- Getting cluster credentials
+	- Upgrading cluster version
+	- Viewing cluster info
+- **Examples:**
+	```sh
+	gcloud container clusters create my-cluster
+	gcloud container clusters get-credentials my-cluster --zone=us-central1-a
+	gcloud container node-pools create my-pool --cluster=my-cluster
+	gcloud container clusters upgrade my-cluster
+	```
+
+### Use `kubectl` for:
+- **Kubernetes workload management** (application layer):
+	- Deploying applications (pods, deployments, statefulsets)
+	- Managing services (ClusterIP, NodePort, LoadBalancer)
+	- Creating config maps and secrets
+	- Scaling deployments
+	- Viewing logs and troubleshooting pods
+	- Applying Kubernetes manifests (YAML)
+	- Managing namespaces, ingresses, persistent volumes
+- **Examples:**
+	```sh
+	kubectl create deployment my-app --image=gcr.io/project/image
+	kubectl expose deployment my-app --type=LoadBalancer --port=80
+	kubectl scale deployment my-app --replicas=3
+	kubectl get pods
+	kubectl logs my-pod
+	kubectl apply -f deployment.yaml
+	```
+
+### Quick Decision Tree:
+- **Question about the cluster itself?** → Use `gcloud`
+- **Question about apps/workloads running IN the cluster?** → Use `kubectl`
+- **Managing GKE infrastructure?** → `gcloud`
+- **Managing Kubernetes resources?** → `kubectl`
+
+### Common Exam Scenario:
+**"You need to deploy a new application to GKE and expose it to the internet."**
+1. ✅ `gcloud container clusters get-credentials my-cluster` (get access to cluster)
+2. ✅ `kubectl create deployment my-app --image=...` (deploy app)
+3. ✅ `kubectl expose deployment my-app --type=LoadBalancer` (expose to internet)
+
+**NOT:** `gcloud container clusters deploy ...` ❌ (doesn't exist)
+
+---
+
 ## gsutil
 CLI for Cloud Storage operations (upload, download, sync, ACLs, lifecycle management). Optimized for large data transfers and scripting.
 
