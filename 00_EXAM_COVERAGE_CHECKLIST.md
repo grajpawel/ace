@@ -52,6 +52,7 @@ This checklist maps your notes to the official Google Associate Cloud Engineer e
 #### 2.3 Planning and configuring data storage
 - [x] Cloud Storage (classes, lifecycle, versioning) - [File 04](04_storage_and_databases.md)
 - [x] Persistent Disks (SSD, HDD, regional, zonal) - [File 04](04_storage_and_databases.md)
+- [x] Local SSDs (IOPS: 680K read, 360K write) - [File 04](04_storage_and_databases.md)
 - [x] Cloud SQL (MySQL, PostgreSQL, SQL Server, HA) - [File 04](04_storage_and_databases.md)
 - [x] Firestore (Native, Datastore mode) - [File 04](04_storage_and_databases.md)
 - [x] Bigtable - [File 04](04_storage_and_databases.md)
@@ -188,6 +189,8 @@ This checklist maps your notes to the official Google Associate Cloud Engineer e
 - [x] Workload Identity - [File 07](07_identity_and_security.md)
 - [x] IAM Conditions - [File 07](07_identity_and_security.md)
 - [x] OS Login - [File 07](07_identity_and_security.md)
+- [x] Workforce Identity Federation (human users) - [File 07](07_identity_and_security.md)
+- [x] Workload Identity Federation (external apps, service account alternative) - [File 07](07_identity_and_security.md)
 - [x] Cloud Identity - [File 07](07_identity_and_security.md)
 
 #### 5.2 Managing service accounts

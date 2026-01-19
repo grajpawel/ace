@@ -67,6 +67,87 @@ Block storage for Compute Engine VMs. Provides high performance and durability f
 
 ---
 
+## Local SSDs (Important IOPS Numbers for Exam!)
+Physically attached to the VM host. Provides extremely high IOPS and low latency but data is ephemeral (lost on VM stop/delete).
+
+- **Key Specifications:**
+	- **Size:** 375 GB per local SSD (fixed size)
+	- **Max per VM:** Up to 24 local SSDs (9 TB total)
+	- **IOPS (Random Read):** Up to **680,000 IOPS** per local SSD
+	- **IOPS (Random Write):** Up to **360,000 IOPS** per local SSD
+	- **Throughput (Read):** Up to 2,650 MB/s per local SSD
+	- **Throughput (Write):** Up to 1,400 MB/s per local SSD
+	- **Latency:** Sub-millisecond (< 1 ms)
+- **Exam-Critical Numbers:**
+	- ✅ **680,000 read IOPS per local SSD** (frequently tested)
+	- ✅ **360,000 write IOPS per local SSD** (frequently tested)
+	- ✅ **375 GB fixed size** per local SSD
+	- ✅ **Data is ephemeral** (lost on VM stop, terminate, or host maintenance)
+- **Interface Types:**
+	- **NVMe:** Default, highest performance
+	- **SCSI:** Legacy, lower performance than NVMe
+- **Use Cases:**
+	- High-performance databases (temporary data)
+	- Caching layers
+	- Scratch space for data processing
+	- Real-time analytics
+	- Gaming servers (session data)
+- **Limitations:**
+	- Data is NOT persistent (ephemeral storage)
+	- Cannot be detached and reattached to different VMs
+	- Lost on VM stop, instance termination, or host maintenance
+	- No snapshots or backups (must implement your own)
+	- Cannot be used with some machine types (check compatibility)
+- **Best Practices:**
+	- Use for temporary, high-performance workloads only
+	- Implement replication/backup at application level
+	- Use RAID 0 for combined throughput across multiple SSDs
+	- Use NVMe interface for best performance
+	- Set VM to "TERMINATE" on host maintenance (default behavior)
+- **Common Exam Scenarios:**
+	- **"Need highest IOPS possible"** → Local SSD (680K read IOPS)
+	- **"Database with temporary data, extreme performance"** → Local SSD
+	- **"Data must survive VM stop"** → Persistent Disk (NOT local SSD)
+	- **"Need 1 million IOPS"** → Multiple local SSDs (2x SSDs = 1.36M read IOPS)
+- **gcloud Examples:**
+	- Create VM with local SSD (NVMe):
+		```sh
+		gcloud compute instances create my-vm \
+			--zone=us-central1-a \
+			--machine-type=n2-standard-4 \
+			--local-ssd=interface=nvme
+		```
+	- Create VM with multiple local SSDs:
+		```sh
+		gcloud compute instances create my-vm \
+			--zone=us-central1-a \
+			--machine-type=n2-standard-8 \
+			--local-ssd=interface=nvme \
+			--local-ssd=interface=nvme \
+			--local-ssd=interface=nvme
+		```
+	- Create VM with SCSI local SSD:
+		```sh
+		gcloud compute instances create my-vm \
+			--zone=us-central1-a \
+			--local-ssd=interface=scsi
+		```
+
+**Comparison Table - Persistent Disk vs Local SSD:**
+
+| Feature | Persistent Disk (SSD) | Local SSD |
+|---------|----------------------|------------|
+| **Max IOPS (Read)** | ~100,000 IOPS | **680,000 IOPS** per SSD |
+| **Max IOPS (Write)** | ~100,000 IOPS | **360,000 IOPS** per SSD |
+| **Persistence** | Data survives VM stop | **Ephemeral** (data lost) |
+| **Size** | Flexible (10 GB - 64 TB) | Fixed **375 GB** per SSD |
+| **Snapshots** | Yes | No |
+| **Detach/Reattach** | Yes | No |
+| **Best For** | Durable storage, databases | Temporary, ultra-high IOPS |
+| **Latency** | Low (~1-2 ms) | **Sub-millisecond** |
+
+---
+
 ## Cloud SQL
 Managed relational database service supporting MySQL, PostgreSQL, and SQL Server. Handles backups, replication, patching, and failover.
 
